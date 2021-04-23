@@ -36,8 +36,10 @@ ar_length <- 4096
 auto_corr <- .9 # Corresponds to `\phi` above
 
 ar_precision_matvec <- function(v, auto_corr) {
-  # Fill in: note that you can vectorize the calculation and do *not* need a for-loop. 
-  # (Hint: how would you efficiently carry out a matrix-vector operation if the matrix has non-zero entries only along the sub or super diagonal?)
+  a = -auto_corr/(1-auto_corr^2)
+  b = (1+auto_corr)/(1-auto_corr^2)
+  n = length(v)
+  a*c(0, v[-ar_length]) + c(v[1], b*v[-c(1,ar_length)], v[ar_length]) + a*c(v[-1], 0)
 }
 
 ar_eig <- eigs_sym(
@@ -54,7 +56,13 @@ ar_eig <- eigs_sym(
 Now, directly compute the eigen decomposition of $\boldsymbol{\Sigma}$ (not $\boldsymbol{\Sigma}^{-1}$) and compare its output with the principal components and associated variances found via Lancsoz algorithm.
 
 ```{r}
-# Fill in
+ar1_cor <- function(ar_length, auto_corr) {
+exponent <- abs(matrix(1:ar_length - 1, nrow = ar_length, ncol = ar_length, byrow = TRUE) - 
+    (1:ar_length - 1))
+auto_corr^exponent
+}
+
+eigen(ar1_cor(ar_length, auto_corr))
 ```
 
 **Remark:** 
